@@ -34,10 +34,22 @@ jobs:
         with:
           gradle-version: 8.9
 
-      - name: Unpack FlowOS source archive if present
+            - name: Unpack FlowOS source archive if present
         run: |
           if [ -f FlowOS-source.zip ]; then
-            unzip -o FlowOS-source.zip || true
+            python3 -c "
+            import zipfile, os
+            with zipfile.ZipFile('FlowOS-source.zip', 'r') as z:
+                for info in z.infolist():
+                    info.filename = info.filename.replace(chr(92), '/')
+                    if info.filename.endswith('/'):
+                        os.makedirs(info.filename, exist_ok=True)
+                    else:
+                        os.makedirs(os.path.dirname(info.filename), exist_ok=True)
+                        z.extract(info, '.')
+            "
+            echo "Extracted files:"
+            find app -type f | head -40
           fi
 
       - name: Build Debug APK
