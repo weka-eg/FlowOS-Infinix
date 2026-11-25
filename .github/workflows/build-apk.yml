@@ -34,7 +34,7 @@ jobs:
         with:
           gradle-version: 8.9
 
-            - name: Unpack FlowOS source archive if present
+      - name: Unpack FlowOS source archive if present
         run: |
           if [ -f FlowOS-source.zip ]; then
             python3 -c "
