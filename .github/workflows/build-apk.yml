@@ -37,19 +37,7 @@ jobs:
       - name: Unpack FlowOS source archive if present
         run: |
           if [ -f FlowOS-source.zip ]; then
-            python3 -c "
-            import zipfile, os
-            with zipfile.ZipFile('FlowOS-source.zip', 'r') as z:
-                for info in z.infolist():
-                    info.filename = info.filename.replace(chr(92), '/')
-                    if info.filename.endswith('/'):
-                        os.makedirs(info.filename, exist_ok=True)
-                    else:
-                        os.makedirs(os.path.dirname(info.filename), exist_ok=True)
-                        z.extract(info, '.')
-            "
-            echo "Extracted files:"
-            find app -type f | head -40
+            python3 -c "import zipfile, os; z=zipfile.ZipFile('FlowOS-source.zip'); [os.makedirs(i.filename.replace(chr(92),'/'), exist_ok=True) if i.filename.replace(chr(92),'/').endswith('/') else (os.makedirs(os.path.dirname(i.filename.replace(chr(92),'/')) or '.', exist_ok=True), open(i.filename.replace(chr(92),'/'), 'wb').write(z.read(i))) for i in z.infolist()]"
           fi
 
       - name: Build Debug APK
